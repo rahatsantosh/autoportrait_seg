@@ -1,5 +1,7 @@
 import torchvision
 import torch
+from torch import nn
+from torch.utils.data import DataLoader
 import numpy as np
 import pickle
 import matplotlib.pyplot as plt
@@ -11,9 +13,6 @@ from dataset import Dataset
 use_cuda = torch.cuda.is_available()
 device = torch.device("cuda:0" if use_cuda else "cpu")
 cudnn.benchmark = True
-
-fcn = torch.load(models.fcn_path)
-fcn.to(device)
 
 deeplab = torch.load(models.deeplab_path)
 deeplab.to(device)
@@ -32,22 +31,22 @@ def iou(outputs: torch.Tensor, labels: torch.Tensor):
 img_path = "../../data/processed/CelebAMask-HQ/imgs"
 mask_path = "../../data/processed/CelebAMask-HQ/mask"
 transform = torchvision.transforms.Compose([
-    transforms.ToTensor(),
-    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225], inplace=True)
+    torchvision.transforms.ToTensor(),
+    torchvision.transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225], inplace=True)
 ])
 
 train_data = Dataset(img_path, mask_path, transform, "train")
-trainingloader = DataLoader(valid_data, batch_size = 8)
+trainingloader = DataLoader(train_data, batch_size = 8)
 
 valid_data = Dataset(img_path, mask_path, transform, "val")
 validationloader = DataLoader(valid_data, batch_size = 8)
 
 criterion = nn.MSELoss()
-optimizer = torch.optim.Adam(model.parameters())
 
-def test_model(model, train_loader, validation_loader, criterion, optimizer, show_epoch=True, gpu=True):
+def test_model(model, train_loader, validation_loader, criterion, n_epochs, show_epoch=True, gpu=True):
     print("-------------------------------------------------")
-    print("MODEL  : "model.__class__.__name__)
+    print("MODEL  : ", model.__class__.__name__)
+    optimizer = torch.optim.Adam(model.parameters())
     accuracy_list=[]
     loss_list=[]
     for epoch in range(n_epochs):
@@ -79,30 +78,15 @@ def test_model(model, train_loader, validation_loader, criterion, optimizer, sho
     print("-------------------------------------------------")
     return loss_list, accuracy_list
 
-
-fcn_loss, fcn_acc = test_model(fcn,
-    train_loader,
-    validation_loader,
-    criterion,
-    optimizer,
-    show_epoch=True,
-    gpu=use_cuda)
-
 deeplab_loss, deeplab_acc = test_model(deeplab,
-    train_loader,
-    validation_loader,
+    trainingloader,
+    validationloader,
     criterion,
-    optimizer,
+    n_epochs = 100,
     show_epoch=True,
     gpu=use_cuda)
 
 epoch = np.arrange(len(fcn_loss))
-
-plt.plot(epoch, fcn_loss, label="FCN")
-plt.plot(epoch, deeplab_loss, label="DeepLabv3")
-plt.xlabel("Training Cycles")
-plt.ylabel("Loss")
-plt.savefig('../../references/fig/loss.png')
 
 plt.plot(epoch, fcn_acc, label="FCN")
 plt.plot(epoch, deeplab_acc, label="DeepLabv3")

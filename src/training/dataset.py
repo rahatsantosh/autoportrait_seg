@@ -28,6 +28,7 @@ class Dataset(Dataset):
        random.seed(seed)
        x = Image.open(self.img_list[index], 'r')
        x = self.transform(x)
+       random.seed(seed)
        y = Image.open(self.mask_list[index], 'r')
        y = self.transform(y)
 
