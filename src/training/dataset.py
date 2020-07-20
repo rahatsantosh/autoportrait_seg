@@ -4,13 +4,14 @@ from PIL import Image
 import random
 from torch.utils.data import Dataset
 class Dataset(Dataset):
-   def __init__(self, img_path, mask_path, transform, split="train"):
+   def __init__(self, img_path, mask_path, transform, transform_op, split="train"):
        #assert split == ("train" or "test" or "val")
 
        self.img_list = []
        self.mask_list = []
        self.length = 0
        self.transform = transform
+       self.transform_op = transform_op
        img_path = os.path.join(img_path, split)
        img_path = os.path.join(img_path, "img")
        for f in os.listdir(img_path):
@@ -29,7 +30,7 @@ class Dataset(Dataset):
        x = Image.open(self.img_list[index], 'r')
        x = self.transform(x)
        random.seed(seed)
-       y = Image.open(self.mask_list[index], 'r')
-       y = self.transform(y)
+       y = Image.open(self.mask_list[index], 'r').convert("L")
+       y = self.transform_op(y)
 
        return x, y

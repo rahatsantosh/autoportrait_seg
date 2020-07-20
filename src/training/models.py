@@ -20,14 +20,9 @@ def repurpose(model_dict, fin_channels):
     return model_dict
 
 def finetune_prep(model):
-
-    for param in model.classifier[1].parameters():
+    for param in model.classifier[4].parameters():
       param.requires_grad = True
-    for param in model.classifier[2].parameters():
-      param.requires_grad = True
-    for param in model.aux_classifier[1].parameters():
-      param.requires_grad = True
-    for param in model.aux_classifier[2].parameters():
+    for param in model.aux_classifier[4].parameters():
       param.requires_grad = True
     return model
 

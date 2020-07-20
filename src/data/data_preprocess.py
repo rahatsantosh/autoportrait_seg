@@ -11,6 +11,7 @@ os.mkdir(os.path.join(path, "mask_"))
 os.mkdir(os.path.join(path, "mask"))
 os.mkdir(os.path.join(path, "img"))
 os.mkdir(os.path.join(path, "img/img"))
+print("Directories created")
 
 destination_path = "../../data/processed/CelebAMask-HQ/mask_/"
 pattern = "../../data/raw/CelebAMask-HQ/CelebAMask-HQ-mask-anno/*/*"
@@ -38,13 +39,14 @@ categories = [
 
 for i in range(30000):
     path = destination_path + "{:05d}".format(i) + "_"
-    combined_ann = np.zeros((512, 512, 3)).astype(np.uint8)
+    combined_ann = np.zeros((512, 512)).astype(np.uint8)
     for cat in categories:
         path_cat = path + cat
         if not os.path.exists(path_cat):
             continue
-        img = cv2.imread(path_cat)
+        img = cv2.imread(path_cat, cv2.IMREAD_GRAYSCALE)
         combined_ann = cv2.add(combined_ann, img)
+    combined_ann = cv2.resize(combined_ann, (224, 224))
     write_path = ann_path + str(i) + ".png"
     cv2.imwrite(write_path, combined_ann)
 
@@ -59,7 +61,7 @@ img_dest = "../../data/processed/CelebAMask-HQ/img/img"
 for f in os.listdir(img_path):
     path = os.path.join(img_path, f)
     img = cv2.imread(path)
-    img = cv2.resize(img, (512, 512))
+    img = cv2.resize(img, (224, 224))
     dest = os.path.join(img_dest, f)
     cv2.imwrite(dest, img)
 

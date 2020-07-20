@@ -7,11 +7,11 @@ import numpy as np
 import os
 
 
-def train_model(model, criterion, dataloaders, optimizer, metrics, bpath, num_epochs=3):
+def train_model(model, criterion, dataloaders, optimizer, metrics, checkpoint_path, bpath, num_epochs=3):
     since = time.time()
     best_model_wts = copy.deepcopy(model.state_dict())
     best_loss = 1e10
-    # Use gpu if available
+    # CUDA for PyTorch
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     model.to(device)
     # Initialize the log file for training and testing loss and metrics
@@ -54,7 +54,7 @@ def train_model(model, criterion, dataloaders, optimizer, metrics, bpath, num_ep
                         if name == 'f1_score':
                             # Use a classification threshold of 0.1
                             batchsummary[f'{phase}_{name}'].append(
-                                metric(y_true, y_pred))
+                                metric(y_true > 0, y_pred > 0.1))
                         else:
                             batchsummary[f'{phase}_{name}'].append(
                                 metric(y_true.astype('uint8'), y_pred))
@@ -63,6 +63,13 @@ def train_model(model, criterion, dataloaders, optimizer, metrics, bpath, num_ep
                     if phase == 'Train':
                         loss.backward()
                         optimizer.step()
+            PATH = checkpoint_path + '_' + epoch + '.pt'
+            torch.save({
+            'epoch': epoch,
+            'model_state_dict': model.state_dict(),
+            'optimizer_state_dict': optimizer.state_dict(),
+            'loss': loss
+            }, PATH)
             batchsummary['epoch'] = epoch
             epoch_loss = loss
             batchsummary[f'{phase}_loss'] = epoch_loss.item()
