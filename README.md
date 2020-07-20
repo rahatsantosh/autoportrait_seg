@@ -75,6 +75,6 @@ Project Organization
 * `src/training/trainer.py` module based on https://github.com/msminhas93/DeepLabv3FineTuning/blob/master/trainer.py
 
 ### MIT License
-All code in the repo is under MIT license, external code and data is under respective licenses.<br />
+All code in the repo is under MIT license, external code and data are under respective licenses.<br />
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)  
 `[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)`
