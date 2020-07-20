@@ -1,0 +1,1 @@
+https://github.com/switchablenorms/CelebAMask-HQ -> CelebAMask-HQ Dataset

@@ -16,7 +16,7 @@ use_cuda = torch.cuda.is_available()
 device = torch.device("cuda:0" if use_cuda else "cpu")
 cudnn.benchmark = True
 
-checkpoint_path = "../../models/checkpoints"
+checkpoint_path = "../../models/checkpoints/checkpoints"
 
 deeplab = torch.load(models.deeplab_path)
 deeplab.to(device)
