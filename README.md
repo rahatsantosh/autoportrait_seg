@@ -33,8 +33,5 @@ Project Organization
     │   │
     │   ├── utils                                <- Scripts utilities used during data generation or training
     │   │
-    │   ├── training                            <- Scripts to train models
-    │   │
-    │   ├── validate                            <- Scripts to validate models
-    │   │
-    │   └── visualization                       <- Scripts to create exploratory and results oriented visualizations
+    │   └── training                            <- Scripts to train models
+    

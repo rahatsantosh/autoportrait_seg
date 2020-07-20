@@ -7,7 +7,7 @@ import numpy as np
 import os
 
 
-def train_model(model, criterion, dataloaders, optimizer, metrics, checkpoint_path, bpath, num_epochs=3):
+def train_model(model, criterion, dataloaders, optimizer, metrics, checkpoint_path, bpath, num_epochs=3, checkpoint_ep = None):
     since = time.time()
     best_model_wts = copy.deepcopy(model.state_dict())
     best_loss = 1e10
@@ -23,9 +23,9 @@ def train_model(model, criterion, dataloaders, optimizer, metrics, checkpoint_pa
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
             writer.writeheader()
 
-    for epoch in range(1, num_epochs+1):
+    for epoch in range(checkpoint_ep+1, num_epochs+1):
         if checkpoint_path is not None and len(os.listdir(checkpoint_path)) != 0:
-            PATH = checkpoint_path + '_' + str(epoch) + '.pt'
+            PATH = checkpoint_path + '_' + str(checkpoint_ep) + '.pt'
             checkpoint = torch.load(PATH)
             model.load_state_dict(checkpoint['model_state_dict'])
             optimizer.load_state_dict(checkpoint['optimizer_state_dict'])

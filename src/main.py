@@ -19,7 +19,7 @@ def main(argv):
          os.system("python training/validate.py")
        elif opt in ("-p", "--pretrained"):
          os.system("python data/get_pretrained.py")
-       print("----Use src/trial.py or notebooks/demo.ipynb to try out the model----")
+       print("----Use notebooks/demo.ipynb to try out the model----")
 
 if __name__ == "__main__":
    main(sys.argv[1:])

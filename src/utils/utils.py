@@ -30,7 +30,7 @@ def get_mask(img, model):
 def predict_mask(img_path, model):
 	img = Image.open(image_path)
 	ip_size = (224, 224)
-	img = img.resize(ip_size))
+	img = img.resize(ip_size)
 
 	mask = get_mask(img, model)
 
