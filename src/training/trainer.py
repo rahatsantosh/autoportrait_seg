@@ -15,14 +15,22 @@ def train_model(model, criterion, dataloaders, optimizer, metrics, checkpoint_pa
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     model.to(device)
     # Initialize the log file for training and testing loss and metrics
-    fieldnames = ['epoch', 'Train_loss', 'Test_loss'] + \
-        [f'Train_{m}' for m in metrics.keys()] + \
-        [f'Test_{m}' for m in metrics.keys()]
-    with open(os.path.join(bpath, 'log.csv'), 'w', newline='') as csvfile:
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-        writer.writeheader()
+    if not(checkpoint_path is not None and len(os.listdir(checkpoint_path)) != 0):
+        fieldnames = ['epoch', 'Train_loss', 'Test_loss'] + \
+            [f'Train_{m}' for m in metrics.keys()] + \
+            [f'Test_{m}' for m in metrics.keys()]
+        with open(os.path.join(bpath, 'log.csv'), 'w', newline='') as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+            writer.writeheader()
 
     for epoch in range(1, num_epochs+1):
+        if checkpoint_path is not None and len(os.listdir(checkpoint_path)) != 0:
+            PATH = checkpoint_path + '_' + str(epoch) + '.pt'
+            checkpoint = torch.load(PATH)
+            model.load_state_dict(checkpoint['model_state_dict'])
+            optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+            epoch = checkpoint['epoch']
+            loss = checkpoint['loss']
         print('Epoch {}/{}'.format(epoch, num_epochs))
         print('-' * 10)
         # Each epoch has a training and validation phase
@@ -63,7 +71,7 @@ def train_model(model, criterion, dataloaders, optimizer, metrics, checkpoint_pa
                     if phase == 'Train':
                         loss.backward()
                         optimizer.step()
-            PATH = checkpoint_path + '_' + epoch + '.pt'
+            PATH = checkpoint_path + '_' + str(epoch) + '.pt'
             torch.save({
             'epoch': epoch,
             'model_state_dict': model.state_dict(),

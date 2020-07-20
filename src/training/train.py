@@ -1,82 +1,48 @@
-import os
-import torch
-import torch.nn as nn
-from torch.backends import cudnn
-from torch.utils.data import DataLoader
+from trainer import train_model
 import torchvision
+import torch
+from torch import nn
+from torch.utils.data import DataLoader
+from sklearn.metrics import roc_auc_score, f1_score
+import numpy as np
+import pickle
+import matplotlib.pyplot as plt
+from torch.backends import cudnn
+import models
 from dataset import Dataset
-from models import Autoencoder1
 
 # CUDA for PyTorch
 use_cuda = torch.cuda.is_available()
 device = torch.device("cuda:0" if use_cuda else "cpu")
 cudnn.benchmark = True
-print(torch.cuda.get_device_name())
+
+checkpoint_path = "../../models/checkpoints"
+
+deeplab = torch.load(models.deeplab_path)
+deeplab.to(device)
 
 img_path = "../../data/processed/CelebAMask-HQ/imgs"
 mask_path = "../../data/processed/CelebAMask-HQ/mask"
-
 transform = torchvision.transforms.Compose([
-    torchvision.transforms.RandomHorizontalFlip(p=0.5),
-    torchvision.transforms.RandomRotation(45),
-    torchvision.transforms.RandomVerticalFlip(p=0.5),
     torchvision.transforms.ToTensor(),
-    torchvision.transforms.Normalize(mean = 0.0, std = 1.0, inplace=True)
+    torchvision.transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225], inplace=True)
 ])
 
-train_data = Dataset(img_path, mask_path, transform, "train")
-trainloader = DataLoader(train_data, batch_size = 6)
-valid_data = Dataset(img_path, mask_path, transform, "val")
-validationloader = DataLoader(valid_data, batch_size = 6)
+transform_op = torchvision.transforms.ToTensor()
 
-def train_model(model,train_loader,validation_loader,optimizer,n_epochs=4,gpu=True):
-    #accuracy_list=[]
-    loss_list=[]
-    tf = torchvision.transforms.Normalize(mean = 0.0, std = 1.0, inplace=True)
-    for epoch in range(n_epochs):
-        for x, y in train_loader:
-            if gpu:
-                # Transfer to GPU
-                x, y = x.to(device), y.to(device)
+train_data = Dataset(img_path, mask_path, transform, transform_op, "train")
+trainingloader = DataLoader(train_data, batch_size = 64)
 
-            model.train()
-            optimizer.zero_grad()
-            z = model(x)
-            loss = criterion(z, y)
-            loss.backward()
-            optimizer.step()
-            loss_list.append(loss.data)
-        print("Epoch : ", epoch, "    Loss : ", loss.data)
+valid_data = Dataset(img_path, mask_path, transform, transform_op, "val")
+validationloader = DataLoader(valid_data, batch_size = 64)
 
-        '''for x_test, y_test in validation_loader:
-            if gpu:
-                # Transfer to GPU
-                x_test, y_test = x_test.to(device), y_test.to(device)
-            model.eval()
-            y_test = tf(y_test)
-            z = model(x_test)
-            iou = mean_iou(z, y_test, 1)
-            accuracy_list.append(accuracy)'''
-
-    return loss_list
-
-model = Autoencoder1()
-if use_cuda:
-	model.to(device)
+dataloaders = {"Train" : trainingloader, "Test" : validationloader}
 
 criterion = nn.MSELoss()
-optimizer = torch.optim.Adam(model.parameters())
+optimizer = torch.optim.Adam(deeplab.parameters())
+metrics = {'f1_score': f1_score, 'auroc': roc_auc_score}
+bpath = "../../reports/performance_data"
 
-loss_list = train_model(
-    model=model,
-    n_epochs=2,
-    train_loader=trainloader,
-    validation_loader=validationloader,
-    optimizer=optimizer,
-    gpu=True)
+deeplab = train_model(deeplab, criterion, dataloaders, optimizer, metrics, checkpoint_path, bpath, num_epochs=30)
 
-'''plt.plot(np.arange(len(accuracy_list)),accuracy_list)
-plt.show()'''
-
-plt.plot(np.arange(len(loss_list)),loss_list)
-plt.show()
+torch.save(deeplab, models.deeplab_path)

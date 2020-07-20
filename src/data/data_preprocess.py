@@ -7,17 +7,20 @@ import split_folders
 
 path = "../../data/processed/CelebAMask-HQ"
 os.mkdir(path)
-os.mkdir(os.path.join(path, "mask_"))
 os.mkdir(os.path.join(path, "mask"))
 os.mkdir(os.path.join(path, "img"))
 os.mkdir(os.path.join(path, "img/img"))
+
+path = "../../data/interim/CelebAMask-HQ"
+os.mkdir(path)
+os.mkdir(os.path.join(path, "mask"))
 print("Directories created")
 
-destination_path = "../../data/processed/CelebAMask-HQ/mask_/"
+destination_path = "../../data/interim/CelebAMask-HQ/mask/"
 pattern = "../../data/raw/CelebAMask-HQ/CelebAMask-HQ-mask-anno/*/*"
 for img in glob.glob(pattern):
     shutil.copy(img, destination_path)
-print("Transferred")
+print("Transfered")
 
 ann_path = "../../data/processed/CelebAMask-HQ/mask/"
 categories = [
@@ -51,9 +54,6 @@ for i in range(30000):
     cv2.imwrite(write_path, combined_ann)
 
 print("Annotations combined")
-
-shutil.rmtree(destination_path)
-print("mask_ directory removed")
 
 img_path = "../../data/raw/CelebAMask-HQ/CelebA-HQ-img"
 img_dest = "../../data/processed/CelebAMask-HQ/img/img"
