@@ -39,6 +39,8 @@ def train_model(model, criterion, dataloaders, optimizer, metrics, bpath, num_ep
             for inputs, masks in tqdm(iter(dataloaders[phase])):
                 '''inputs = sample['image'].to(device)
                 masks = sample['mask'].to(device)'''
+                inputs = inputs.to(device)
+                masks = masks.to(device)
                 # zero the parameter gradients
                 optimizer.zero_grad()
 
@@ -52,7 +54,7 @@ def train_model(model, criterion, dataloaders, optimizer, metrics, bpath, num_ep
                         if name == 'f1_score':
                             # Use a classification threshold of 0.1
                             batchsummary[f'{phase}_{name}'].append(
-                                metric(y_true > 0, y_pred > 0.1))
+                                metric(y_true, y_pred))
                         else:
                             batchsummary[f'{phase}_{name}'].append(
                                 metric(y_true.astype('uint8'), y_pred))

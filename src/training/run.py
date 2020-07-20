@@ -19,6 +19,13 @@ cudnn.benchmark = True
 deeplab = torch.load(models.deeplab_path)
 deeplab.to(device)
 
+img_path = "../../data/processed/CelebAMask-HQ/imgs"
+mask_path = "../../data/processed/CelebAMask-HQ/mask"
+transform = torchvision.transforms.Compose([
+    torchvision.transforms.ToTensor(),
+    torchvision.transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225], inplace=True)
+])
+
 train_data = Dataset(img_path, mask_path, transform, "train")
 trainingloader = DataLoader(train_data, batch_size = 8)
 
