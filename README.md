@@ -26,11 +26,11 @@ To get argument details : `python src/main.py -h`
 
 ## Performance Metrics
 ### Training Loss
-![Image of Yaktocat](https://octodex.github.com/images/yaktocat.png)
+![Loss Plot](https://github.com/rahatsantosh/autoportrait_seg/blob/master/reports/fig/loss_plot.png)
 ### F1 Score
-![Image of Yaktocat](https://octodex.github.com/images/yaktocat.png)
+![F1 Metric Plot](https://github.com/rahatsantosh/autoportrait_seg/blob/master/reports/fig/f1_metric.png)
 ### Area Under ROC Curve
-![Image of Yaktocat](https://octodex.github.com/images/yaktocat.png)
+![AUROC Metric Plot](https://github.com/rahatsantosh/autoportrait_seg/blob/master/reports/fig/auroc_metric.png)
 
 Project Organization
 ------------
@@ -75,6 +75,6 @@ Project Organization
 * `src/training/trainer.py` module based on https://github.com/msminhas93/DeepLabv3FineTuning/blob/master/trainer.py
 
 ### MIT License
-All code in the repo is under MIT license, external code and data is under respective licenses.<br />
+All code in the repo is under MIT license, external code and data are under respective licenses.<br />
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)  
 `[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)`
